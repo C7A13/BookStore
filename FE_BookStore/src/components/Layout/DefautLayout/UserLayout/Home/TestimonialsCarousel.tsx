@@ -1,0 +1,190 @@
+import { Star } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+
+interface Testimonial {
+    id: number;
+    name: string;
+    location: string;
+    image: string;
+    rating: number;
+    text: string;
+}
+
+interface CustomVariants {
+    [key: string]: any;
+}
+
+interface TestimonialsCarouselProps { }
+
+const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = () => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+    const testimonials: Testimonial[] = [
+        {
+            id: 1,
+            name: 'Nguyễn Thị Lan',
+            location: 'Hà Nội',
+            image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+            rating: 5,
+            text: 'Mình mua sách trên website này rất nhiều lần rồi. Giao hàng siêu nhanh, sách đẹp, đóng gói cẩn thận. Đặc biệt là có nhiều đầu sách hay và hiếm. Rất đáng tin cậy!',
+        },
+        {
+            id: 2,
+            name: 'Trần Minh Quân',
+            location: 'TP. Hồ Chí Minh',
+            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+            rating: 5,
+            text: 'Các tour trên trang web này thật tuyệt vời. Tôi đã thực sự tận hưởng cùng gia đình! Đội ngũ rất chuyên nghiệp và chăm sóc khách hàng chu đáo. Chắc chắn sẽ giới thiệu bạn bè tham gia công ty này!',
+        },
+        {
+            id: 3,
+            name: 'Phạm Thu Hà',
+            location: 'Đà Nẵng',
+            image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
+            rating: 5,
+            text: 'Trải nghiệm mua sách cực kỳ tốt! Sách mới, giá cạnh tranh, lại còn có khuyến mãi thường xuyên. Nhân viên tư vấn rất nhiệt tình. Mình sẽ tiếp tục ủng hộ lâu dài.',
+        },
+        {
+            id: 4,
+            name: 'Lê Hoàng Nam',
+            location: 'Hải Phòng',
+            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
+            rating: 5,
+            text: 'Rất hài lòng với chất lượng dịch vụ. Sách được kiểm tra kỹ trước khi gửi, có cả bookmark xinh xắn. Đây là website bán sách online uy tín nhất mà mình từng mua!',
+        },
+    ];
+
+    const goToSlide = (index: number) => {
+        setCurrentIndex(index);
+    };
+
+    const getCardPosition = (index: number) => {
+        const diff = index - currentIndex;
+
+        if (diff === 0) {
+            return 'translate-x-0 scale-110 opacity-100 z-30';
+        } else if (diff === -1) {
+            return '-translate-x-[105%] scale-90 opacity-50 z-10';
+        } else if (diff === 1) {
+            return 'translate-x-[105%] scale-90 opacity-50 z-10';
+        } else {
+            return 'translate-x-0 scale-75 opacity-0 z-0';
+        }
+    };
+
+    const headerVariants: CustomVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.4, 2, 0.6, 1] } },
+    };
+
+    const carouselVariants: CustomVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: [0.4, 2, 0.6, 1],
+                when: 'beforeChildren',
+                staggerChildren: 0.2,
+            },
+        },
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center py-16 px-4">
+            <div className="max-w-6xl w-full">
+                {/* Tiêu đề */}
+                <motion.div
+                    variants={headerVariants}
+                    initial="hidden"
+                    animate={isInView ? 'visible' : 'hidden'}
+                    className="text-center mb-20"
+                >
+                    <h2 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight px-4">
+                        Khách hàng nói gì<br />về chúng tôi
+                    </h2>
+                </motion.div>
+
+                {/* Carousel Container */}
+                <motion.div
+                    ref={ref}
+                    variants={carouselVariants}
+                    initial="hidden"
+                    animate={isInView ? 'visible' : 'hidden'}
+                    className="h-96 mb-16"
+                >
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        {testimonials.map((testimonial, index) => (
+                            <div
+                                key={testimonial.id}
+                                className={`absolute w-full max-w-2xl transition-all duration-500 ease-out ${getCardPosition(index)}`}
+                                style={{ pointerEvents: index === currentIndex ? 'auto' : 'none' }}
+                            >
+                                <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl">
+                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                                        {/* Avatar */}
+                                        <img
+                                            src={testimonial.image}
+                                            alt={testimonial.name}
+                                            className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover flex-shrink-0"
+                                        />
+
+                                        {/* Content */}
+                                        <div className="flex-1">
+                                            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                                                <div>
+                                                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                                                        {testimonial.name}
+                                                    </h3>
+                                                    <p className="text-gray-400 text-sm md:text-base">
+                                                        {testimonial.location}
+                                                    </p>
+                                                </div>
+
+                                                {/* Stars */}
+                                                <div className="flex gap-1 mt-2 md:mt-0">
+                                                    {[...Array(testimonial.rating)].map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className="w-5 h-5 md:w-6 md:h-6 fill-yellow-400 text-yellow-400"
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Review Text */}
+                                            <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+                                                “{testimonial.text}”
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Dots Navigation */}
+                <div className="flex justify-center gap-3">
+                    {testimonials.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => goToSlide(index)}
+                            className={`h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                                ? 'bg-cyan-500 w-8'
+                                : 'bg-gray-300 w-3'
+                                }`}
+                            aria-label={`Chuyển đến đánh giá ${index + 1}`}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TestimonialsCarousel;
